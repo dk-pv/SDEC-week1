@@ -30,9 +30,33 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    qrCode: {
+      type: String,
+      default: null,
+    },
+    qrToken: {
+      type: String,
+      default: null,
+    },
+    qrGeneratedByAdmin: {
+      type: Boolean,
+      default: false,
+    },
 
     status: {
       type: String,
+      enum: [
+        "Pending Admin Confirmation",
+        "Confirmed",
+        "Processing",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered",
+        "Cancelled",
+        "Returned",
+        "Refunded",
+        "Failed",
+      ],
       default: "Pending Admin Confirmation",
     },
   },
