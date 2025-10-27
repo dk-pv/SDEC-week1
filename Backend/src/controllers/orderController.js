@@ -46,40 +46,82 @@ export const getAllOrders = async (req, res) => {
 
 
 
+// export const generateQrCode = async (req, res) => {
+//   try {
+//     const { id } = req.params; // order ID (MongoDB _id)
+//     const adminSecret = process.env.JWT_SECRET || "securekey";
+
+//     // 1️⃣ Find the order
+//     const order = await Order.findById(id);
+//     if (!order) {
+//       return res.status(404).json({ success: false, message: "Order not found" });
+//     }
+
+//     // 2️⃣ Generate secure token (valid for 7 days)
+//     const qrToken = jwt.sign(
+//       { orderId: order._id, userName: order.userName },
+//       adminSecret,
+//       { expiresIn: "7d" }
+//     );
+
+//     // 3️⃣ Create QR URL (this will be scanned later)
+//     const qrDataURL = await QRCode.toDataURL(
+//       `${process.env.FRONTEND_URL}/scan/${qrToken}`
+//     );
+
+//     // 4️⃣ Update order with QR info
+//     order.qrCode = qrDataURL;
+//     order.qrToken = qrToken;
+//     order.qrGeneratedByAdmin = true;
+//     await order.save();
+
+//     res.status(200).json({
+//       success: true,
+//       message: "QR code generated successfully",
+//       qrCode: qrDataURL,
+//       orderId: order.orderId,
+//     });
+//   } catch (error) {
+//     console.error("❌ QR generation error:", error);
+//     res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
+
 export const generateQrCode = async (req, res) => {
   try {
-    const { id } = req.params; // order ID (MongoDB _id)
+    const { id } = req.params;
     const adminSecret = process.env.JWT_SECRET || "securekey";
 
-    // 1️⃣ Find the order
     const order = await Order.findById(id);
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
-    // 2️⃣ Generate secure token (valid for 7 days)
     const qrToken = jwt.sign(
       { orderId: order._id, userName: order.userName },
       adminSecret,
       { expiresIn: "7d" }
     );
 
-    // 3️⃣ Create QR URL (this will be scanned later)
     const qrDataURL = await QRCode.toDataURL(
       `${process.env.FRONTEND_URL}/scan/${qrToken}`
     );
 
-    // 4️⃣ Update order with QR info
     order.qrCode = qrDataURL;
     order.qrToken = qrToken;
     order.qrGeneratedByAdmin = true;
+
+    order.status = "Confirmed";
+
     await order.save();
 
     res.status(200).json({
       success: true,
-      message: "QR code generated successfully",
+      message: "QR code generated successfully & status updated to Confirmed",
       qrCode: qrDataURL,
       orderId: order.orderId,
+      status: order.status,
     });
   } catch (error) {
     console.error("❌ QR generation error:", error);
