@@ -9,10 +9,7 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "No products found in order" });
     }
 
-    // Generate unique Order ID
-    const orderId = generateOrderId();
-
-    // Create order
+    const orderId = generateOrderId()
     const newOrder = await Order.create({
       orderId,
       userName,
