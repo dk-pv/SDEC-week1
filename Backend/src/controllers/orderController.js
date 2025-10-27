@@ -3,23 +3,26 @@ import { generateOrderId } from "../utils/generateOrderId.js";
 import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
 
-
 export const createOrder = async (req, res) => {
   try {
-    const { userName, products } = req.body; 
+    const { userName, products } = req.body;
 
     if (!products || products.length === 0) {
-      return res.status(400).json({ success: false, message: "No products found in order" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No products found in order" });
     }
 
-    const orderId = generateOrderId()
+    const orderId = generateOrderId();
     const newOrder = await Order.create({
       orderId,
       userName,
       products,
     });
 
-    console.log(`📢 Admin notified: New order ${orderId} created by ${userName}`);
+    console.log(
+      `📢 Admin notified: New order ${orderId} created by ${userName}`
+    );
 
     res.status(201).json({
       success: true,
@@ -31,6 +34,7 @@ export const createOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 export const getAllOrders = async (req, res) => {
@@ -45,49 +49,6 @@ export const getAllOrders = async (req, res) => {
 
 
 
-
-// export const generateQrCode = async (req, res) => {
-//   try {
-//     const { id } = req.params; // order ID (MongoDB _id)
-//     const adminSecret = process.env.JWT_SECRET || "securekey";
-
-//     // 1️⃣ Find the order
-//     const order = await Order.findById(id);
-//     if (!order) {
-//       return res.status(404).json({ success: false, message: "Order not found" });
-//     }
-
-//     // 2️⃣ Generate secure token (valid for 7 days)
-//     const qrToken = jwt.sign(
-//       { orderId: order._id, userName: order.userName },
-//       adminSecret,
-//       { expiresIn: "7d" }
-//     );
-
-//     // 3️⃣ Create QR URL (this will be scanned later)
-//     const qrDataURL = await QRCode.toDataURL(
-//       `${process.env.FRONTEND_URL}/scan/${qrToken}`
-//     );
-
-//     // 4️⃣ Update order with QR info
-//     order.qrCode = qrDataURL;
-//     order.qrToken = qrToken;
-//     order.qrGeneratedByAdmin = true;
-//     await order.save();
-
-//     res.status(200).json({
-//       success: true,
-//       message: "QR code generated successfully",
-//       qrCode: qrDataURL,
-//       orderId: order.orderId,
-//     });
-//   } catch (error) {
-//     console.error("❌ QR generation error:", error);
-//     res.status(500).json({ success: false, message: "Server error" });
-//   }
-// };
-
-
 export const generateQrCode = async (req, res) => {
   try {
     const { id } = req.params;
@@ -95,7 +56,9 @@ export const generateQrCode = async (req, res) => {
 
     const order = await Order.findById(id);
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
     }
 
     const qrToken = jwt.sign(
@@ -126,5 +89,122 @@ export const generateQrCode = async (req, res) => {
   } catch (error) {
     console.error("❌ QR generation error:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+
+export const verifyQrToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const secret = process.env.JWT_SECRET || "securekey";
+    const decoded = jwt.verify(token, secret);
+
+    const order = await Order.findById(decoded.orderId);
+    if (!order) {
+      console.log("⚠️ Order not found for token:", decoded.orderId);
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "QR verified successfully",
+      order: {
+        _id: order._id,
+        orderId: order.orderId,
+        userName: order.userName,
+        totalAmount: order.totalAmount,
+        status: order.status,
+        products: order.products,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("❌ QR Verify Error:", error);
+
+    if (error.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "QR token expired. Please request a new QR code.",
+        });
+    }
+
+    res.status(401).json({
+      success: false,
+      message: "Invalid QR token or unauthorized access.",
+    });
+  }
+};
+
+
+
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    console.log("🧾 Status update request received:", { id, status });
+
+    const validStatuses = [
+      "Processing",
+      "Shipped",
+      "Out for Delivery",
+      "Delivered",
+      "Cancelled",
+      "Returned",
+      "Refunded",
+      "Failed",
+    ];
+
+    if (!status || !validStatuses.includes(status)) {
+      console.log("❌ Invalid status value:", status);
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status value provided." });
+    }
+
+    if (!id || id.length !== 24) {
+      console.log("❌ Invalid or missing Order ID:", id);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or missing Order ID.",
+      });
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      console.log("⚠️ Order not found:", id);
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    console.log("✅ Order status updated:", updatedOrder.status);
+
+    res.status(200).json({
+      success: true,
+      message: `Order status updated to '${updatedOrder.status}' successfully.`,
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("❌ Update status error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating order status.",
+      error: error.message,
+    });
   }
 };
