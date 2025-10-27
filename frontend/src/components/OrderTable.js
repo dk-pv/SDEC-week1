@@ -7,7 +7,6 @@ export default function OrderTable({ orders }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
 
-  // 🔁 Fetch updated orders on component mount
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -20,7 +19,6 @@ export default function OrderTable({ orders }) {
     loadOrders();
   }, []);
 
-  // ✅ Generate QR + Update Status
   const handleGenerateQR = async (orderId) => {
     try {
       setLoadingId(orderId);
@@ -29,7 +27,6 @@ export default function OrderTable({ orders }) {
       if (res.success) {
         toast.success("QR Code generated & order confirmed!");
 
-        // ✅ Update UI instantly
         setOrderList((prev) =>
           prev.map((order) =>
             order._id === orderId
@@ -54,7 +51,6 @@ export default function OrderTable({ orders }) {
     }
   };
 
-  // 🎨 Status Badge Colors
   const getStatusColor = (status) => {
     const statusMap = {
       "Pending Admin Confirmation":
@@ -68,7 +64,6 @@ export default function OrderTable({ orders }) {
     return statusMap[status] || "bg-gray-100 text-gray-800 border-gray-300";
   };
 
-  // 🕒 Format Date
   const formatDate = (dateString) => {
     const date = new Date(dateString?.$date || dateString);
     return date.toLocaleDateString("en-US", {
@@ -83,7 +78,9 @@ export default function OrderTable({ orders }) {
   if (!orderList || orderList.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-600 px-4">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-center">No Orders Yet</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-center">
+          No Orders Yet
+        </h2>
         <p className="text-base sm:text-lg text-center">
           Orders will appear here once customers place them.
         </p>
@@ -108,7 +105,9 @@ export default function OrderTable({ orders }) {
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
                   <p className="text-xs text-gray-500 mb-1">Order ID</p>
-                  <p className="font-bold text-gray-900 text-sm sm:text-base">{order.orderId}</p>
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">
+                    {order.orderId}
+                  </p>
                 </div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
@@ -122,7 +121,9 @@ export default function OrderTable({ orders }) {
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Customer</p>
-                  <p className="text-sm font-medium text-gray-700">{order.userName}</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {order.userName}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Total</p>
@@ -132,14 +133,20 @@ export default function OrderTable({ orders }) {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">Items</p>
-                  <p className="text-sm text-gray-700">{order.products.length}</p>
+                  <p className="text-sm text-gray-700">
+                    {order.products.length}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 mb-1">QR Status</p>
                   {order.qrGeneratedByAdmin || order.qrGenerated ? (
-                    <p className="text-sm text-green-600 font-semibold">Generated</p>
+                    <p className="text-sm text-green-600 font-semibold">
+                      Generated
+                    </p>
                   ) : (
-                    <p className="text-sm text-orange-600 font-semibold">Pending</p>
+                    <p className="text-sm text-orange-600 font-semibold">
+                      Pending
+                    </p>
                   )}
                 </div>
               </div>
@@ -171,13 +178,27 @@ export default function OrderTable({ orders }) {
             <table className="w-full text-sm text-gray-800">
               <thead className="bg-indigo-50 text-indigo-700 uppercase text-xs tracking-widest font-semibold">
                 <tr>
-                  <th className="px-4 xl:px-8 py-5 text-left whitespace-nowrap">Order ID</th>
-                  <th className="px-4 xl:px-8 py-5 text-left whitespace-nowrap">Customer</th>
-                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">Items</th>
-                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">Total</th>
-                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">Status</th>
-                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">QR</th>
-                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">Actions</th>
+                  <th className="px-4 xl:px-8 py-5 text-left whitespace-nowrap">
+                    Order ID
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-left whitespace-nowrap">
+                    Customer
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
+                    Items
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
+                    Total
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
+                    QR
+                  </th>
+                  <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -189,7 +210,9 @@ export default function OrderTable({ orders }) {
                     <td className="px-4 xl:px-8 py-5 font-semibold text-gray-900 whitespace-nowrap">
                       {order.orderId}
                     </td>
-                    <td className="px-4 xl:px-8 py-5 text-gray-700">{order.userName}</td>
+                    <td className="px-4 xl:px-8 py-5 text-gray-700">
+                      {order.userName}
+                    </td>
                     <td className="px-4 xl:px-8 py-5 text-center">
                       {order.products.length}
                     </td>
@@ -242,13 +265,13 @@ export default function OrderTable({ orders }) {
           <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/30 z-50 p-3 sm:p-4 md:p-6">
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
               {/* Modal Header - Fixed */}
-              <div className="flex justify-between items-center border-b border-gray-200 p-4 sm:p-6 md:p-8 flex-shrink-0">
+              <div className="flex justify-between items-center border-b border-gray-200 p-4 sm:p-6 md:p-8 shrink-0">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 pr-4">
                   Order Details - {selectedOrder.orderId}
                 </h2>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="text-gray-500 hover:text-red-600 text-2xl sm:text-3xl transition flex-shrink-1"
+                  className="text-gray-500 hover:text-red-600 text-2xl sm:text-3xl transition shrink"
                 >
                   &times;
                 </button>
@@ -291,7 +314,7 @@ export default function OrderTable({ orders }) {
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                     Ordered Products
                   </h3>
-                  
+
                   {/* Mobile Product Cards */}
                   <div className="block sm:hidden space-y-3">
                     {selectedOrder.products.map((p, i) => (
@@ -299,15 +322,21 @@ export default function OrderTable({ orders }) {
                         key={i}
                         className="bg-gray-50 p-4 rounded-lg border border-gray-200"
                       >
-                        <p className="font-semibold text-gray-900 mb-2">{p.name}</p>
+                        <p className="font-semibold text-gray-900 mb-2">
+                          {p.name}
+                        </p>
                         <div className="grid grid-cols-3 gap-2 text-sm">
                           <div>
                             <p className="text-gray-500 text-xs">Qty</p>
-                            <p className="text-gray-700 font-medium">{p.quantity}</p>
+                            <p className="text-gray-700 font-medium">
+                              {p.quantity}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-500 text-xs">Price</p>
-                            <p className="text-gray-700">₹{p.price.toLocaleString()}</p>
+                            <p className="text-gray-700">
+                              ₹{p.price.toLocaleString()}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-500 text-xs">Total</p>
@@ -334,7 +363,9 @@ export default function OrderTable({ orders }) {
                           <th className="py-3 sm:py-4 px-3 sm:px-6 text-center border-b">
                             Price
                           </th>
-                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-right border-b">Total</th>
+                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-right border-b">
+                            Total
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -343,7 +374,9 @@ export default function OrderTable({ orders }) {
                             key={i}
                             className="border-b hover:bg-gray-50 transition"
                           >
-                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-700 text-sm">{p.name}</td>
+                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-700 text-sm">
+                              {p.name}
+                            </td>
                             <td className="py-3 sm:py-4 px-3 sm:px-6 text-center text-gray-700 text-sm">
                               {p.quantity}
                             </td>
