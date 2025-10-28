@@ -3,6 +3,9 @@ import { generateOrderId } from "../utils/generateOrderId.js";
 import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
 import { io } from "../server.js";
+import { sendEmail } from "../utils/sendEmail.js";
+
+
 
 export const createOrder = async (req, res) => {
   try {
@@ -47,6 +50,10 @@ export const getAllOrders = async (req, res) => {
 
 
 
+
+
+
+
 export const generateQrCode = async (req, res) => {
   try {
     const { id } = req.params;
@@ -72,10 +79,19 @@ export const generateQrCode = async (req, res) => {
     order.qrCode = qrDataURL;
     order.qrToken = qrToken;
     order.qrGeneratedByAdmin = true;
-
     order.status = "Confirmed";
 
     await order.save();
+
+    // ✅ Email notification (without QR)
+    const emailHtml = `
+      <h2>Hi ${order.userName},</h2>
+      <p>Your order <b>${order.orderId}</b> has been <b>confirmed</b>.</p>
+      <p>We'll notify you when your order is processed and ready for shipment.</p>
+      <p>Thank you for choosing us! 💙</p>
+    `;
+
+    await sendEmail(order.email, "Your Order is Confirmed 🎉", emailHtml);
 
     io.emit("orderUpdated", {
       orderId: order._id,
@@ -85,7 +101,7 @@ export const generateQrCode = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "QR code generated successfully & status updated to Confirmed",
+      message: "QR generated & confirmation email sent.",
       qrCode: qrDataURL,
       orderId: order.orderId,
       status: order.status,
@@ -95,6 +111,8 @@ export const generateQrCode = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
 
 
 
