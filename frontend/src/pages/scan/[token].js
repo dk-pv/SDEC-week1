@@ -92,7 +92,6 @@ export default function ScanOrderPage() {
     );
   }
 
-  // ✅ Successfully verified QR
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6 flex items-center justify-center">
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-3xl border border-gray-100">
@@ -194,22 +193,6 @@ export default function ScanOrderPage() {
               📥 Download QR Code
             </button>
           )}
-
-          <button
-            onClick={() => router.push("/")}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
-          >
-            Back to Home
-          </button>
-        </div>
-
-        <div className="text-center mt-8">
-          <button
-            onClick={() => router.push("/")}
-            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
-          >
-            Back to Home
-          </button>
         </div>
       </div>
     </div>

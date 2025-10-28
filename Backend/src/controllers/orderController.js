@@ -13,7 +13,6 @@ export const createOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "No products found in order" });
     }
-
     const orderId = generateOrderId();
     const newOrder = await Order.create({
       orderId,
@@ -21,30 +20,31 @@ export const createOrder = async (req, res) => {
       products,
     });
 
-    console.log(
-      `📢 Admin notified: New order ${orderId} created by ${userName}`
-    );
-
     res.status(201).json({
       success: true,
       message: "Order created successfully",
       order: newOrder,
     });
   } catch (error) {
-    console.error("❌ Error creating order:", error);
+    console.error("error creating order:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
 
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.status(200).json({ success: true, orders });
   } catch (error) {
-    console.error("❌ Error fetching orders:", error);
+    console.error("Error fetching orders:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+
 
 export const generateQrCode = async (req, res) => {
   try {
@@ -95,15 +95,18 @@ export const generateQrCode = async (req, res) => {
   }
 };
 
+
+
+
 export const verifyQrToken = async (req, res) => {
   try {
     const { token } = req.params;
-    const secret = process.env.JWT_SECRET || "securekey";
+    const secret = process.env.JWT_SECRET || "superstrongkey123";
     const decoded = jwt.verify(token, secret);
 
     const order = await Order.findById(decoded.orderId);
     if (!order) {
-      console.log("⚠️ Order not found for token:", decoded.orderId);
+      console.log("Order not found for token:", decoded.orderId);
       return res.status(404).json({
         success: false,
         message: "Order not found",
@@ -126,7 +129,7 @@ export const verifyQrToken = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("❌ QR Verify Error:", error);
+    console.error("QR Verify Error:", error);
 
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({
@@ -142,13 +145,13 @@ export const verifyQrToken = async (req, res) => {
   }
 };
 
+
+
+
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
-    console.log("🧾 Status update request received:", { id, status });
-
     const validStatuses = [
       "Processing",
       "Shipped",
@@ -161,14 +164,14 @@ export const updateOrderStatus = async (req, res) => {
     ];
 
     if (!status || !validStatuses.includes(status)) {
-      console.log("❌ Invalid status value:", status);
+      console.log("Invalid status value:", status);
       return res
         .status(400)
         .json({ success: false, message: "Invalid status value provided." });
     }
 
     if (!id || id.length !== 24) {
-      console.log("❌ Invalid or missing Order ID:", id);
+      console.log("Invalid or missing Order ID:", id);
       return res.status(400).json({
         success: false,
         message: "Invalid or missing Order ID.",
@@ -182,14 +185,12 @@ export const updateOrderStatus = async (req, res) => {
     );
 
     if (!updatedOrder) {
-      console.log("⚠️ Order not found:", id);
+      console.log("Order not found:", id);
       return res.status(404).json({
         success: false,
         message: "Order not found.",
       });
     }
-
-    console.log("✅ Order status updated:", updatedOrder.status);
 
     io.emit("orderUpdated", {
       orderId: updatedOrder._id,
@@ -202,7 +203,7 @@ export const updateOrderStatus = async (req, res) => {
       order: updatedOrder,
     });
   } catch (error) {
-    console.error("❌ Update status error:", error.message);
+    console.error("Update status error:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error while updating order status.",
@@ -211,7 +212,8 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-// in orderController.js
+
+
 export const getOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
