@@ -35,8 +35,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-
-
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -46,8 +44,6 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
 
 export const generateQrCode = async (req, res) => {
   try {
@@ -92,8 +88,6 @@ export const generateQrCode = async (req, res) => {
   }
 };
 
-
-
 export const verifyQrToken = async (req, res) => {
   try {
     const { token } = req.params;
@@ -121,18 +115,17 @@ export const verifyQrToken = async (req, res) => {
         products: order.products,
         createdAt: order.createdAt,
         updatedAt: order.updatedAt,
+        qrCode: order.qrCode,
       },
     });
   } catch (error) {
     console.error("❌ QR Verify Error:", error);
 
     if (error.name === "TokenExpiredError") {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "QR token expired. Please request a new QR code.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "QR token expired. Please request a new QR code.",
+      });
     }
 
     res.status(401).json({
@@ -141,9 +134,6 @@ export const verifyQrToken = async (req, res) => {
     });
   }
 };
-
-
-
 
 export const updateOrderStatus = async (req, res) => {
   try {

@@ -180,6 +180,29 @@ export default function ScanOrderPage() {
           </table>
         </div>
 
+        <div className="text-center mt-8 flex flex-col gap-3">
+          {order.qrCode && (
+            <button
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = order.qrCode;
+                link.download = `${order.orderId}_QRCode.png`;
+                link.click();
+              }}
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+            >
+              📥 Download QR Code
+            </button>
+          )}
+
+          <button
+            onClick={() => router.push("/")}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
+          >
+            Back to Home
+          </button>
+        </div>
+
         <div className="text-center mt-8">
           <button
             onClick={() => router.push("/")}

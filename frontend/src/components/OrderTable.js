@@ -413,6 +413,18 @@ export default function OrderTable({ orders }) {
                     <p className="text-gray-600 text-xs sm:text-sm mt-3">
                       Scan this QR to verify order
                     </p>
+
+                    <button
+                      onClick={() => {
+                        const link = document.createElement("a");
+                        link.href = selectedOrder.qrCode;
+                        link.download = `${selectedOrder.orderId}_QRCode.png`;
+                        link.click();
+                      }}
+                      className="mt-4 px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                    >
+                      📥 Download QR Code
+                    </button>
                   </div>
                 )}
               </div>
