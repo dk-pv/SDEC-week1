@@ -17,6 +17,12 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      required: true, 
+      lowercase: true,
+      trim: true,
+    },
 
     products: [
       {
@@ -55,7 +61,6 @@ const orderSchema = new mongoose.Schema(
         "Cancelled",
         "Returned",
         "Refunded",
-        "Failed",
       ],
       default: "Pending Admin Confirmation",
     },

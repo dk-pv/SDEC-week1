@@ -6,7 +6,7 @@ import { io } from "../server.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { userName, products } = req.body;
+    const { userName, products , email} = req.body;
 
     if (!products || products.length === 0) {
       return res
@@ -17,6 +17,7 @@ export const createOrder = async (req, res) => {
     const newOrder = await Order.create({
       orderId,
       userName,
+      email,
       products,
     });
 
