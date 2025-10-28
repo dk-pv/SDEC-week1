@@ -1,5 +1,12 @@
 import express from "express";
-import { createOrder, generateQrCode , getAllOrders , verifyQrToken , updateOrderStatus} from "../controllers/orderController.js";
+import {
+  createOrder,
+  generateQrCode,
+  getAllOrders,
+  verifyQrToken,
+  updateOrderStatus,
+  getOrdersByUser
+} from "../controllers/orderController.js";
 
 const router = express.Router();
 
@@ -13,6 +20,6 @@ router.get("/verify/:token", verifyQrToken);
 
 router.put("/status/:id", updateOrderStatus);
 
-
+router.get("/user/:userId", getOrdersByUser);
 
 export default router;

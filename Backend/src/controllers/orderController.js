@@ -2,6 +2,7 @@ import Order from "../models/Order.js";
 import { generateOrderId } from "../utils/generateOrderId.js";
 import QRCode from "qrcode";
 import jwt from "jsonwebtoken";
+import { io } from "../server.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -74,6 +75,12 @@ export const generateQrCode = async (req, res) => {
     order.status = "Confirmed";
 
     await order.save();
+
+    io.emit("orderUpdated", {
+      orderId: order._id,
+      status: order.status,
+      qrGenerated: true,
+    });
 
     res.status(200).json({
       success: true,
@@ -184,6 +191,11 @@ export const updateOrderStatus = async (req, res) => {
 
     console.log("✅ Order status updated:", updatedOrder.status);
 
+    io.emit("orderUpdated", {
+      orderId: updatedOrder._id,
+      status: updatedOrder.status,
+    });
+
     res.status(200).json({
       success: true,
       message: `Order status updated to '${updatedOrder.status}' successfully.`,
@@ -196,5 +208,24 @@ export const updateOrderStatus = async (req, res) => {
       message: "Server error while updating order status.",
       error: error.message,
     });
+  }
+};
+
+// in orderController.js
+export const getOrdersByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+
+    if (!orders || orders.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No orders found" });
+    }
+
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    console.error("Error fetching user orders:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
