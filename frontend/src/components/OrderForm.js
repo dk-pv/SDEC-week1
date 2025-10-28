@@ -8,19 +8,16 @@ export default function OrderForm() {
   ]);
   const [message, setMessage] = useState("");
 
-  // 🧾 Add a new product row
   const addProduct = () => {
     setProducts([...products, { name: "", price: "", quantity: 1 }]);
   };
 
-  // 🧮 Remove a product row
   const removeProduct = (index) => {
     const updated = [...products];
     updated.splice(index, 1);
     setProducts(updated);
   };
 
-  // ✏️ Handle input changes
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const updated = [...products];
@@ -59,7 +56,7 @@ export default function OrderForm() {
       const result = await createOrder(orderData);
 
       if (result.success) {
-        setMessage(`✅ Order Created! ID: ${result.order.orderId}`);
+        setMessage(`Order Created! ID: ${result.order.orderId}`);
 
         // Auto-hide message after 2.5 seconds
         setTimeout(() => setMessage(""), 2500);
@@ -67,7 +64,7 @@ export default function OrderForm() {
         setUserName("");
         setProducts([{ name: "", price: "", quantity: 1 }]);
       } else {
-        setMessage("❌ Failed to create order.");
+        setMessage("Failed to create order.");
         setTimeout(() => setMessage(""), 2500);
       }
     } catch (err) {
