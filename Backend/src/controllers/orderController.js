@@ -14,6 +14,7 @@ export const createOrder = async (req, res) => {
         .status(400)
         .json({ success: false, message: "No products found in order" });
     }
+
     const orderId = generateOrderId();
     const newOrder = await Order.create({
       orderId,
@@ -21,6 +22,8 @@ export const createOrder = async (req, res) => {
       email,
       products,
     });
+
+    io.emit("newOrder", newOrder);
 
     res.status(201).json({
       success: true,
@@ -33,9 +36,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-
-
-
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -45,8 +45,6 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
 
 export const generateQrCode = async (req, res) => {
   try {
@@ -105,9 +103,6 @@ export const generateQrCode = async (req, res) => {
   }
 };
 
-
-
-
 export const verifyQrToken = async (req, res) => {
   try {
     const { token } = req.params;
@@ -155,7 +150,6 @@ export const verifyQrToken = async (req, res) => {
     });
   }
 };
-
 
 export const updateOrderStatus = async (req, res) => {
   try {
@@ -256,11 +250,6 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-
-
-
-
-
 export const getOrdersByUser = async (req, res) => {
   try {
     const { email } = req.params;
@@ -276,7 +265,7 @@ export const getOrdersByUser = async (req, res) => {
 
     const orders = await Order.find({
       email: email.toLowerCase().trim(),
-      status: { $ne: "Pending Admin Confirmation" } // ← Exclude this status
+      status: { $ne: "Pending Admin Confirmation" }, // ← Exclude this status
     }).sort({ createdAt: -1 });
 
     if (!orders || orders.length === 0) {
