@@ -41,7 +41,6 @@ export default function OrderTable({ orders }) {
       }
     );
 
-    // ✅ Listen for new order event from backend
     socket.on("newOrder", (newOrder) => {
       setOrderList((prev) => [newOrder, ...prev]);
       toast.success(`🆕 New order received: ${newOrder.orderId}`);

@@ -36,6 +36,9 @@ export const createOrder = async (req, res) => {
   }
 };
 
+
+
+
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -46,10 +49,14 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
+
+
+
 export const generateQrCode = async (req, res) => {
   try {
     const { id } = req.params;
-    const adminSecret = process.env.JWT_SECRET || "securekey";
+    const adminSecret = process.env.JWT_SECRET;
+    if (!adminSecret) throw new Error("JWT_SECRET not configured");
 
     const order = await Order.findById(id);
     if (!order) {
@@ -59,9 +66,14 @@ export const generateQrCode = async (req, res) => {
     }
 
     const qrToken = jwt.sign(
-      { orderId: order._id, userName: order.userName },
+      {
+        orderId: order._id,
+        userName: order.userName,
+        email: order.email,
+        issuedAt: Date.now(),
+      },
       adminSecret,
-      { expiresIn: "7d" }
+      { expiresIn: "2d" } 
     );
 
     const qrDataURL = await QRCode.toDataURL(
@@ -90,6 +102,11 @@ export const generateQrCode = async (req, res) => {
       qrGenerated: true,
     });
 
+    io.emit("orderConfirmedForUser", {
+      email: order.email,
+      order: order,
+    });
+
     res.status(200).json({
       success: true,
       message: "QR generated & confirmation email sent.",
@@ -103,18 +120,29 @@ export const generateQrCode = async (req, res) => {
   }
 };
 
+
+
+
 export const verifyQrToken = async (req, res) => {
   try {
     const { token } = req.params;
-    const secret = process.env.JWT_SECRET || "superstrongkey123";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error("JWT_SECRET not configured");
+
     const decoded = jwt.verify(token, secret);
 
     const order = await Order.findById(decoded.orderId);
     if (!order) {
-      console.log("Order not found for token:", decoded.orderId);
       return res.status(404).json({
         success: false,
         message: "Order not found",
+      });
+    }
+
+    if (order.qrToken !== token) {
+      return res.status(401).json({
+        success: false,
+        message: "QR token mismatch or invalid.",
       });
     }
 
@@ -150,6 +178,9 @@ export const verifyQrToken = async (req, res) => {
     });
   }
 };
+
+
+
 
 export const updateOrderStatus = async (req, res) => {
   try {
@@ -250,11 +281,14 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
+
+
+
+
 export const getOrdersByUser = async (req, res) => {
   try {
     const { email } = req.params;
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
       return res.status(400).json({
@@ -262,10 +296,9 @@ export const getOrdersByUser = async (req, res) => {
         message: "Valid email is required",
       });
     }
-
     const orders = await Order.find({
       email: email.toLowerCase().trim(),
-      status: { $ne: "Pending Admin Confirmation" }, // ← Exclude this status
+      status: { $ne: "Pending Admin Confirmation" },
     }).sort({ createdAt: -1 });
 
     if (!orders || orders.length === 0) {
