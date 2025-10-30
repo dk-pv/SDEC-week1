@@ -20,6 +20,6 @@ router.get("/verify/:token", verifyQrToken);
 
 router.put("/status/:id", updateOrderStatus);
 
-router.get("/user/:userId", getOrdersByUser);
+router.get("/user/:email", getOrdersByUser);
 
 export default router;

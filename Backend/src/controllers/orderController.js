@@ -5,11 +5,9 @@ import jwt from "jsonwebtoken";
 import { io } from "../server.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-
-
 export const createOrder = async (req, res) => {
   try {
-    const { userName, products , email} = req.body;
+    const { userName, products, email } = req.body;
 
     if (!products || products.length === 0) {
       return res
@@ -37,6 +35,7 @@ export const createOrder = async (req, res) => {
 
 
 
+
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -46,11 +45,6 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
-
-
-
 
 
 
@@ -83,7 +77,6 @@ export const generateQrCode = async (req, res) => {
 
     await order.save();
 
-    // ✅ Email notification (without QR)
     const emailHtml = `
       <h2>Hi ${order.userName},</h2>
       <p>Your order <b>${order.orderId}</b> has been <b>confirmed</b>.</p>
@@ -115,8 +108,6 @@ export const generateQrCode = async (req, res) => {
 
 
 
-
-
 export const verifyQrToken = async (req, res) => {
   try {
     const { token } = req.params;
@@ -139,6 +130,7 @@ export const verifyQrToken = async (req, res) => {
         _id: order._id,
         orderId: order.orderId,
         userName: order.userName,
+        email: order.email,
         totalAmount: order.totalAmount,
         status: order.status,
         products: order.products,
@@ -163,8 +155,6 @@ export const verifyQrToken = async (req, res) => {
     });
   }
 };
-
-
 
 
 export const updateOrderStatus = async (req, res) => {
@@ -211,6 +201,41 @@ export const updateOrderStatus = async (req, res) => {
       });
     }
 
+    if (updatedOrder.email) {
+      let subject = `Order ${updatedOrder.orderId} - Status: ${status}`;
+      let html = `
+        <h2>Hi ${updatedOrder.userName},</h2>
+        <p>Your order <b>${updatedOrder.orderId}</b> status has been updated to <b>${status}</b>.</p>
+      `;
+
+      if (status === "Processing") {
+        html += `<p>We’re preparing your order for shipment 🚀.</p>`;
+      } else if (status === "Shipped") {
+        html += `<p>Your order is on the way 🚚.</p>`;
+      } else if (status === "Out for Delivery") {
+        html += `<p>Our delivery agent will reach you soon 📦.</p>`;
+      } else if (status === "Delivered") {
+        html += `<p>Thank you! Your order has been successfully delivered 🎉.</p>`;
+      } else if (status === "Cancelled") {
+        html += `<p>Your order has been cancelled ❌. Please contact support if you need help.</p>`;
+      } else if (status === "Returned") {
+        html += `<p>Your return request is being processed 🔄.</p>`;
+      } else if (status === "Refunded") {
+        html += `<p>Your refund has been issued successfully 💰.</p>`;
+      } else if (status === "Failed") {
+        html += `<p>There was an issue with your order. Please contact support.</p>`;
+      }
+
+      try {
+        await sendEmail(updatedOrder.email, subject, html);
+        console.log(
+          `📧 Email sent to ${updatedOrder.email} for status: ${status}`
+        );
+      } catch (emailErr) {
+        console.error("❌ Email sending failed:", emailErr);
+      }
+    }
+
     io.emit("orderUpdated", {
       orderId: updatedOrder._id,
       status: updatedOrder.status,
@@ -233,20 +258,43 @@ export const updateOrderStatus = async (req, res) => {
 
 
 
+
+
+
 export const getOrdersByUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    const { email } = req.params;
 
-    if (!orders || orders.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "No orders found" });
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
     }
 
-    res.status(200).json({ success: true, orders });
+    const orders = await Order.find({
+      email: email.toLowerCase().trim(),
+      status: { $ne: "Pending Admin Confirmation" } // ← Exclude this status
+    }).sort({ createdAt: -1 });
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found for this email",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      orders,
+    });
   } catch (error) {
-    console.error("Error fetching user orders:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error fetching user orders by email:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
