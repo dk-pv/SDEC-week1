@@ -116,7 +116,6 @@ export default function OrderTable({ orders }) {
       if (data.success) {
         toast.success(`Status updated to ${newStatus}!`);
 
-        // Update local state
         setOrderList((prev) =>
           prev.map((order) =>
             order._id === selectedOrder._id
@@ -125,7 +124,6 @@ export default function OrderTable({ orders }) {
           )
         );
 
-        // Update modal
         setSelectedOrder((prev) => ({ ...prev, status: newStatus }));
         setNewStatus("");
       } else {
