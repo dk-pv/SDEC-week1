@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true, 
+      required: true,
       lowercase: true,
       trim: true,
     },
@@ -36,14 +36,17 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
     qrCode: {
       type: String,
       default: null,
     },
+
     qrToken: {
       type: String,
       default: null,
     },
+
     qrGeneratedByAdmin: {
       type: Boolean,
       default: false,
@@ -64,16 +67,62 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Pending Admin Confirmation",
     },
+
+    // 🆕 Status change history (log)
+    statusHistory: [
+      {
+        status: { type: String },
+        changedBy: { type: String }, // 'Admin' or 'System' or 'User'
+        timestamp: { type: Date, default: Date.now },
+        note: { type: String }, // optional comment
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
 
+// 🧮 Auto calculate total amount
 orderSchema.pre("save", function (next) {
-  this.totalAmount = this.products.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
-  }, 0);
+  this.totalAmount = this.products.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  next();
+});
+
+// 🧱 Prevent editing completed (Delivered) orders
+orderSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  const orderId = this.getQuery()._id || this.getQuery().id;
+
+  if (!orderId) return next();
+
+  const order = await this.model.findById(orderId);
+  if (!order) return next();
+
+  // Prevent updates if order is already delivered
+  if (order.status === "Delivered") {
+    const err = new Error(
+      "Completed orders cannot be modified (read-only protection enabled)."
+    );
+    err.status = 403;
+    return next(err);
+  }
+
+  if (update.status && update.status !== order.status) {
+    const historyEntry = {
+      status: update.status,
+      changedBy: "Admin",
+      timestamp: new Date(),
+      note: `Status changed from ${order.status} → ${update.status}`,
+    };
+
+    // Push history entry
+    await order.updateOne({ $push: { statusHistory: historyEntry } });
+  }
+
   next();
 });
 

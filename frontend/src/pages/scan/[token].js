@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function ScanOrderPage() {
   const router = useRouter();
@@ -50,6 +51,12 @@ export default function ScanOrderPage() {
   const handleStatusUpdate = async (newStatus) => {
     if (!newStatus || newStatus === order.status) return;
 
+    // Prevent update if already Delivered
+    if (order.status === "Delivered") {
+      toast.error("Delivered orders cannot be modified.");
+      return;
+    }
+
     try {
       setUpdating(true);
       const res = await axios.put(
@@ -59,11 +66,26 @@ export default function ScanOrderPage() {
 
       if (res.data.success) {
         setOrder((prev) => ({ ...prev, status: newStatus }));
-        alert("Status updated successfully!");
+
+        const statusIcons = {
+          Shipped: "Shipped",
+          "Out for Delivery": "Truck",
+          Delivered: "Check",
+          Cancelled: "Cross",
+          Returned: "Return",
+          Refunded: "Money",
+          Processing: "Gear",
+        };
+
+        toast.success(
+          `${
+            statusIcons[newStatus] || "Update"
+          } Order status updated to "${newStatus}"`,
+          { duration: 3000 }
+        );
       }
     } catch (err) {
-      console.error("Status update failed:", err);
-      alert("Failed to update status");
+      toast.error("Failed to update order status. Please try again.");
     } finally {
       setUpdating(false);
     }
@@ -97,8 +119,13 @@ export default function ScanOrderPage() {
     );
   }
 
+  const isDelivered = order.status === "Delivered";
+
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6 flex items-center justify-center">
+      {/* Hot Toast Container */}
+      <Toaster position="top-right" reverseOrder={false} />
+
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-3xl border border-gray-100">
         <h1 className="text-3xl font-bold text-center text-indigo-700 mb-6">
           Order Verified Successfully
@@ -135,6 +162,8 @@ export default function ScanOrderPage() {
               className={`px-3 py-1 rounded-full text-sm font-medium border ${
                 order.status === "Confirmed"
                   ? "bg-green-100 text-green-800 border-green-200"
+                  : order.status === "Delivered"
+                  ? "bg-teal-100 text-teal-800 border-teal-200"
                   : "bg-yellow-100 text-yellow-800 border-yellow-200"
               }`}
             >
@@ -143,26 +172,39 @@ export default function ScanOrderPage() {
           </div>
         </div>
 
-        {/* Status Update Dropdown */}
+        {/* Status Update Dropdown - Disabled if Delivered */}
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             Update Order Status
           </h3>
           <select
-            className="border border-gray-300 rounded-lg p-2 w-full text-gray-700 focus:ring-2 focus:ring-indigo-500"
+            className={`border rounded-lg p-2 w-full text-gray-700 focus:ring-2 focus:ring-indigo-500 transition ${
+              isDelivered
+                ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
+                : "border-gray-300 focus:border-indigo-500"
+            }`}
             onChange={(e) => handleStatusUpdate(e.target.value)}
-            disabled={updating}
+            disabled={updating || isDelivered}
             value={order.status}
           >
-            <option disabled value={order.status}>
-              {order.status}
+            <option value={order.status} disabled>
+              {order.status} (Current)
             </option>
-            {statusOptions.map((s, i) => (
-              <option key={i} value={s}>
-                {s}
-              </option>
-            ))}
+            {statusOptions
+              .filter((s) => s !== order.status)
+              .map((s, i) => (
+                <option key={i} value={s}>
+                  {s}
+                </option>
+              ))}
           </select>
+
+          {/* Info message if Delivered */}
+          {isDelivered && (
+            <p className="text-xs text-gray-500 mt-2 italic">
+              Delivered orders cannot be modified.
+            </p>
+          )}
         </div>
 
         <h2 className="text-xl font-bold text-gray-800 mt-10 mb-3">
@@ -198,7 +240,7 @@ export default function ScanOrderPage() {
                 link.download = `${order.orderId}_QRCode.png`;
                 link.click();
               }}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
             >
               Download QR Code
             </button>

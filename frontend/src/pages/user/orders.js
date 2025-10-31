@@ -50,9 +50,11 @@ export default function UserOrders() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
       setLoading(true);
       const res = await axios.get(
@@ -60,15 +62,24 @@ export default function UserOrders() {
           process.env.NEXT_PUBLIC_API_URL
         }/api/orders/user/${encodeURIComponent(email.trim())}`
       );
-      if (res.data.success) {
+
+      if (res.data.success && res.data.orders.length > 0) {
         setOrders(res.data.orders);
-        setSearched(true);
+        setMessage("");
       } else {
         setOrders([]);
+        setMessage(
+          res.data.message ||
+            "No orders found for this email. Please check the email and try again."
+        );
       }
+      setSearched(true);
     } catch (err) {
       console.error("Error fetching orders:", err);
       setOrders([]);
+      setMessage(
+        "Unable to fetch orders. Please check your email and try again."
+      );
       setSearched(true);
     } finally {
       setLoading(false);
@@ -204,10 +215,10 @@ export default function UserOrders() {
           </div>
         )}
 
-        {searched && orders.length === 0 && !loading && (
+        {searched && !loading && message && (
           <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No orders found for this email</p>
+            <p className="text-gray-500">{message}</p>
           </div>
         )}
 
@@ -255,18 +266,14 @@ export default function UserOrders() {
           </div>
         )}
 
-        {/* MODAL WITH BLUR BACKGROUND */}
+        {/* Modal with Blur Background */}
         {selectedOrder && (
           <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
-            {/* Blur Background */}
             <div
               className="absolute inset-0 backdrop-blur-sm bg-white/80"
               onClick={() => setSelectedOrder(null)}
             />
-
-            {/* Modal */}
             <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10">
-              {/* Header */}
               <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white z-20">
                 <h2 className="text-xl font-bold text-gray-800">
                   Order Details
@@ -279,9 +286,7 @@ export default function UserOrders() {
                 </button>
               </div>
 
-              {/* Body */}
               <div className="p-5 space-y-5">
-                {/* Customer Info */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
                     <User className="w-5 h-5 text-gray-500" />
@@ -319,7 +324,6 @@ export default function UserOrders() {
                   </div>
                 </div>
 
-                {/* Status Tracker */}
                 <div className="border-t pt-4">
                   <h3 className="font-semibold text-gray-800 mb-3">
                     Order Progress
@@ -327,7 +331,6 @@ export default function UserOrders() {
                   {renderStatusTracker(selectedOrder.status)}
                 </div>
 
-                {/* Products */}
                 <div className="border-t pt-4">
                   <h3 className="font-semibold text-gray-800 mb-3">Products</h3>
                   <div className="space-y-3">

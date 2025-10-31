@@ -36,9 +36,6 @@ export const createOrder = async (req, res) => {
   }
 };
 
-
-
-
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -48,9 +45,6 @@ export const getAllOrders = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
-
 
 export const generateQrCode = async (req, res) => {
   try {
@@ -73,7 +67,7 @@ export const generateQrCode = async (req, res) => {
         issuedAt: Date.now(),
       },
       adminSecret,
-      { expiresIn: "2d" } 
+      { expiresIn: "2d" }
     );
 
     const qrDataURL = await QRCode.toDataURL(
@@ -119,9 +113,6 @@ export const generateQrCode = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
-
-
 
 export const verifyQrToken = async (req, res) => {
   try {
@@ -179,13 +170,11 @@ export const verifyQrToken = async (req, res) => {
   }
 };
 
-
-
-
 export const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
+
     const validStatuses = [
       "Processing",
       "Shipped",
@@ -198,28 +187,37 @@ export const updateOrderStatus = async (req, res) => {
     ];
 
     if (!status || !validStatuses.includes(status)) {
-      console.log("Invalid status value:", status);
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid status value provided." });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value provided.",
+      });
     }
 
     if (!id || id.length !== 24) {
-      console.log("Invalid or missing Order ID:", id);
       return res.status(400).json({
         success: false,
         message: "Invalid or missing Order ID.",
       });
     }
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
+    let updatedOrder;
+    try {
+      updatedOrder = await Order.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true }
+      );
+    } catch (err) {
+      if (err.status === 403) {
+        return res.status(403).json({
+          success: false,
+          message: "Completed (Delivered) orders cannot be modified.",
+        });
+      }
+      throw err;
+    }
 
     if (!updatedOrder) {
-      console.log("Order not found:", id);
       return res.status(404).json({
         success: false,
         message: "Order not found.",
@@ -272,7 +270,7 @@ export const updateOrderStatus = async (req, res) => {
       order: updatedOrder,
     });
   } catch (error) {
-    console.error("Update status error:", error.message);
+    console.error("❌ Update status error:", error.message);
     res.status(500).json({
       success: false,
       message: "Server error while updating order status.",
@@ -281,42 +279,44 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-
-
-
-
 export const getOrdersByUser = async (req, res) => {
   try {
     const { email } = req.params;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      return res.status(400).json({
+      return res.json({
         success: false,
-        message: "Valid email is required",
+        message: "Please enter a valid email address.",
+        orders: [],
       });
     }
-    const orders = await Order.find({
-      email: email.toLowerCase().trim(),
-      status: { $ne: "Pending Admin Confirmation" },
-    }).sort({ createdAt: -1 });
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const orders = await Order.find({ email: normalizedEmail }).sort({
+      createdAt: -1,
+    });
 
     if (!orders || orders.length === 0) {
-      return res.status(404).json({
+      return res.json({
         success: false,
-        message: "No orders found for this email",
+        message:
+          "No orders found for this email. Please check the email and try again.",
+        orders: [],
       });
     }
 
-    res.status(200).json({
+    return res.json({
       success: true,
       orders,
     });
   } catch (error) {
     console.error("Error fetching user orders by email:", error);
-    res.status(500).json({
+    return res.json({
       success: false,
-      message: "Server error",
+      message:
+        "Something went wrong while fetching orders. Please try again later.",
+      orders: [],
     });
   }
 };
