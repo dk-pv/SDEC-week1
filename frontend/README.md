@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+                                Module 1 — Order Management System (Realtime +QR Integration)
 
-## Getting Started
 
-First, run the development server:
+■ Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+    This module implements a realtime order management workflow using MERN Stack with Socket.io
+    and JWT-secured QR codes. It allows users to create and track orders, while admins can manage
+    orders, generate QR codes, and update statuses. The system provides live updates and sends
+    email notifications at every stage.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+■ Architecture Overview
 
-## Learn More
+    Frontend: React (Next.js) + Tailwind CSS Backend: Node.js + Express Database: MongoDB +
+    Mongoose Realtime: Socket.io Security: JWT Email: Nodemailer
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+■ System Flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    1. User places order → Backend creates order → Emits 'newOrder' to admin 
+    2. Admin panel receives order in real-time 
+    3. Admin generates JWT-secured QR → Status 'Confirmed' 
+    4. Emailsent to user (confirmation) 
+    5. QR scan verifies JWT token → Secure order view
+    6. Admin updates status → User updates in real-time
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+■ Completed Features 
+
+    .User Order Creation 
+    .Admin Dashboard 
+    .QR Generation (JWT-secured) 
+    .QR Scanning & Verification 
+    .Email Notifications 
+    .Realtime Sync (Socket.io) 
+    .Read-only Completed Orders 
+    .Log History (Timestamps) 
+    .Documentation (README) 
+
+
+
+
+■ Module: WEEK01 — Realtime Order Management
+■ Developer: Danish
+■ Version: 1.0.0
+■ Date: October 2025

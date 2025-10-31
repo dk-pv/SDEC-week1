@@ -63,7 +63,6 @@ export default function OrderTable({ orders }) {
     };
   }, []);
 
-  // QR Generate - Auto set to "Confirmed" + Add log with time
   const handleGenerateQR = async (orderId) => {
     try {
       setLoadingId(orderId);
@@ -112,7 +111,6 @@ export default function OrderTable({ orders }) {
       return;
     }
 
-    // Check if QR is generated or status is Confirmed
     const canUpdate =
       selectedOrder.qrGeneratedByAdmin ||
       selectedOrder.qrGenerated ||
@@ -156,7 +154,6 @@ export default function OrderTable({ orders }) {
         setNewStatus("");
       } else {
         if (res.status === 403) {
-          // No toast - handled by UI message
         } else {
           toast.error(data.message || "Failed to update status.");
         }
@@ -172,18 +169,18 @@ export default function OrderTable({ orders }) {
   const getStatusColor = (status) => {
     const statusMap = {
       "Pending Admin Confirmation":
-        "bg-yellow-100 text-yellow-800 border-yellow-300",
-      Confirmed: "bg-teal-100 text-teal-800 border-teal-300",
-      Processing: "bg-blue-100 text-blue-800 border-blue-300",
-      Shipped: "bg-purple-100 text-purple-800 border-purple-300",
-      "Out for Delivery": "bg-orange-100 text-orange-800 border-orange-300",
-      Delivered: "bg-green-100 text-green-800 border-green-300",
-      Cancelled: "bg-red-100 text-red-800 border-red-300",
-      Returned: "bg-pink-100 text-pink-800 border-pink-300",
-      Refunded: "bg-indigo-100 text-indigo-800 border-indigo-300",
-      Failed: "bg-gray-100 text-gray-800 border-gray-300",
+        "bg-amber-50 text-amber-700 border-amber-200",
+      Confirmed: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      Processing: "bg-blue-50 text-blue-700 border-blue-200",
+      Shipped: "bg-violet-50 text-violet-700 border-violet-200",
+      "Out for Delivery": "bg-orange-50 text-orange-700 border-orange-200",
+      Delivered: "bg-green-50 text-green-700 border-green-200",
+      Cancelled: "bg-red-50 text-red-700 border-red-200",
+      Returned: "bg-pink-50 text-pink-700 border-pink-200",
+      Refunded: "bg-indigo-50 text-indigo-700 border-indigo-200",
+      Failed: "bg-slate-50 text-slate-700 border-slate-200",
     };
-    return statusMap[status] || "bg-gray-100 text-gray-800 border-gray-300";
+    return statusMap[status] || "bg-gray-50 text-gray-700 border-gray-200";
   };
 
   const formatDate = (dateString) => {
@@ -199,40 +196,67 @@ export default function OrderTable({ orders }) {
 
   if (!orderList || orderList.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-600 px-4">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-center">
-          No Orders Yet
-        </h2>
-        <p className="text-base sm:text-lg text-center">
-          Orders will appear here once customers place them.
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 text-slate-600 px-4">
+        <div className="text-center bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              className="w-10 h-10 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-slate-800">
+            No Orders Yet
+          </h2>
+          <p className="text-base sm:text-lg text-slate-500">
+            Orders will appear here once customers place them.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6">
+    <div className="min-h-screen w-full bg-slate-50 py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 md:mb-10 text-center px-2">
-          Admin - Customer Orders
-        </h1>
+        {/* Header with Dark Accent */}
+        <div className="mb-6 sm:mb-8 md:mb-10">
+          <div className="bg-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+              Order Management
+            </h1>
+            <p className="text-slate-300 mt-2 text-sm sm:text-base">
+              Manage and track all customer orders
+            </p>
+          </div>
+        </div>
 
         {/* Mobile Card View */}
         <div className="block lg:hidden space-y-4">
           {orderList.map((order) => (
             <div
               key={order._id}
-              className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-5"
+              className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow border border-slate-200 p-4 sm:p-5"
             >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 mb-1">Order ID</p>
-                  <p className="font-bold text-gray-900 text-sm sm:text-base">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Order ID
+                  </p>
+                  <p className="font-bold text-slate-900 text-sm sm:text-base">
                     {order.orderId}
                   </p>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                  className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                     order.status
                   )}`}
                 >
@@ -242,39 +266,55 @@ export default function OrderTable({ orders }) {
 
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Customer</p>
-                  <p className="text-sm font-medium text-gray-700">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Customer
+                  </p>
+                  <p className="text-sm font-medium text-slate-800">
                     {order.userName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Email</p>
-                  <p className="text-xs sm:text-sm text-gray-600 break-all">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Email
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-600 break-all">
                     {order.email}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Total</p>
-                  <p className="text-sm font-semibold text-indigo-700">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Total
+                  </p>
+                  <p className="text-sm font-bold text-slate-900">
                     ₹{order.totalAmount.toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Items</p>
-                  <p className="text-sm text-gray-700">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    Items
+                  </p>
+                  <p className="text-sm text-slate-700 font-medium">
                     {order.products.length}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 mb-1">QR Status</p>
+                <div className="col-span-2">
+                  <p className="text-xs text-slate-500 font-medium mb-1">
+                    QR Status
+                  </p>
                   {order.qrGeneratedByAdmin || order.qrGenerated ? (
-                    <p className="text-sm text-green-600 font-semibold">
-                      Generated
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                      <p className="text-sm text-emerald-600 font-semibold">
+                        Generated
+                      </p>
+                    </div>
                   ) : (
-                    <p className="text-sm text-orange-600 font-semibold">
-                      Pending
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+                      <p className="text-sm text-amber-600 font-semibold">
+                        Pending
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -284,7 +324,7 @@ export default function OrderTable({ orders }) {
                   <button
                     onClick={() => handleGenerateQR(order._id)}
                     disabled={loadingId === order._id}
-                    className="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed transition"
+                    className="flex-1 bg-slate-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-900 disabled:bg-slate-400 disabled:cursor-not-allowed transition-all shadow-md"
                   >
                     {loadingId === order._id ? "Generating..." : "Generate QR"}
                   </button>
@@ -294,7 +334,7 @@ export default function OrderTable({ orders }) {
                     setSelectedOrder(order);
                     setNewStatus(order.status);
                   }}
-                  className="flex-1 bg-gray-100 text-indigo-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200 transition"
+                  className="flex-1 bg-white border-2 border-slate-700 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-700 hover:text-white transition-all"
                 >
                   View Details
                 </button>
@@ -304,10 +344,10 @@ export default function OrderTable({ orders }) {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden lg:block w-full bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+        <div className="hidden lg:block w-full bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-gray-800">
-              <thead className="bg-indigo-50 text-indigo-700 uppercase text-xs tracking-widest font-semibold">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-800 text-white uppercase text-xs tracking-wider font-semibold">
                 <tr>
                   <th className="px-4 xl:px-8 py-5 text-left whitespace-nowrap">
                     Order ID
@@ -325,39 +365,41 @@ export default function OrderTable({ orders }) {
                     Status
                   </th>
                   <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
-                    QR
+                    QR Code
                   </th>
                   <th className="px-4 xl:px-8 py-5 text-center whitespace-nowrap">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-200">
                 {orderList.map((order) => (
                   <tr
                     key={order._id}
-                    className="border-b border-gray-200 hover:bg-indigo-50/50 transition-all duration-200"
+                    className="hover:bg-slate-50 transition-colors duration-150"
                   >
-                    <td className="px-4 xl:px-8 py-5 font-semibold text-gray-900 whitespace-nowrap">
+                    <td className="px-4 xl:px-8 py-5 font-bold text-slate-900 whitespace-nowrap">
                       {order.orderId}
                     </td>
-                    <td className="px-4 xl:px-8 py-5 text-gray-700">
+                    <td className="px-4 xl:px-8 py-5">
                       <div>
-                        <p className="font-medium">{order.userName}</p>
-                        <p className="text-xs text-gray-500 break-all">
+                        <p className="font-semibold text-slate-800">
+                          {order.userName}
+                        </p>
+                        <p className="text-xs text-slate-500 break-all">
                           {order.email}
                         </p>
                       </div>
                     </td>
-                    <td className="px-4 xl:px-8 py-5 text-center">
+                    <td className="px-4 xl:px-8 py-5 text-center font-semibold text-slate-700">
                       {order.products.length}
                     </td>
-                    <td className="px-4 xl:px-8 py-5 text-center font-semibold text-indigo-700 whitespace-nowrap">
+                    <td className="px-4 xl:px-8 py-5 text-center font-bold text-slate-900 whitespace-nowrap">
                       ₹{order.totalAmount.toLocaleString()}
                     </td>
                     <td className="px-4 xl:px-8 py-5 text-center">
                       <span
-                        className={`px-3 xl:px-4 py-1.5 rounded-full text-xs font-medium border ${getStatusColor(
+                        className={`inline-block px-3 xl:px-4 py-1.5 rounded-full text-xs font-semibold border ${getStatusColor(
                           order.status
                         )}`}
                       >
@@ -366,14 +408,17 @@ export default function OrderTable({ orders }) {
                     </td>
                     <td className="px-4 xl:px-8 py-5 text-center">
                       {order.qrGeneratedByAdmin || order.qrGenerated ? (
-                        <span className="text-green-600 font-semibold">
-                          Generated
-                        </span>
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                          <span className="text-emerald-600 font-semibold text-sm">
+                            Generated
+                          </span>
+                        </div>
                       ) : (
                         <button
                           onClick={() => handleGenerateQR(order._id)}
                           disabled={loadingId === order._id}
-                          className="bg-indigo-600 text-white px-4 xl:px-5 py-2 rounded-lg text-xs font-medium hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed transition whitespace-nowrap"
+                          className="bg-slate-800 text-white px-4 xl:px-5 py-2 rounded-lg text-xs font-semibold hover:bg-slate-900 disabled:bg-slate-400 disabled:cursor-not-allowed transition-all shadow-md whitespace-nowrap"
                         >
                           {loadingId === order._id
                             ? "Generating..."
@@ -387,7 +432,7 @@ export default function OrderTable({ orders }) {
                           setSelectedOrder(order);
                           setNewStatus(order.status);
                         }}
-                        className="text-indigo-600 hover:text-indigo-800 font-semibold transition whitespace-nowrap"
+                        className="text-slate-700 hover:text-slate-900 font-semibold transition-colors whitespace-nowrap underline decoration-2 underline-offset-2"
                       >
                         View Details
                       </button>
@@ -401,49 +446,82 @@ export default function OrderTable({ orders }) {
 
         {/* Order Details Modal */}
         {selectedOrder && (
-          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/30 z-50 p-3 sm:p-4 md:p-6">
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
-              {/* Modal Header */}
-              <div className="flex justify-between items-center border-b border-gray-200 p-4 sm:p-6 md:p-8 shrink-0">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 pr-4">
-                  Order Details - {selectedOrder.orderId}
-                </h2>
-                <button
-                  onClick={() => setSelectedOrder(null)}
-                  className="text-gray-500 hover:text-red-600 text-2xl sm:text-3xl transition shrink"
-                >
-                  ×
-                </button>
+          <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-slate-900 bg-opacity-20 z-50 p-3 sm:p-4 md:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col border border-slate-200">
+              {/* Modal Header with Dark Background */}
+              <div className="bg-slate-800 text-white p-4 sm:p-6 md:p-8 shrink-0">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold pr-4">
+                      Order Details
+                    </h2>
+                    <p className="text-slate-300 text-sm mt-1">
+                      {selectedOrder.orderId}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSelectedOrder(null)}
+                    className="text-white hover:text-red-400 text-3xl transition shrink-0 w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-10"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
 
               {/* Modal Body - Scrollable */}
-              <div className="overflow-y-auto p-4 sm:p-6 md:p-8 flex-1">
+              <div className="overflow-y-auto p-4 sm:p-6 md:p-8 flex-1 bg-slate-50">
                 {/* Customer Info */}
                 <div className="mb-6 sm:mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-gray-50 p-4 sm:p-5 rounded-xl border border-gray-200">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">
-                      Customer
+                  <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                      <svg
+                        className="w-5 h-5 text-slate-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      </svg>
+                      Customer Information
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-700 font-medium">
+                    <p className="text-sm sm:text-base text-slate-900 font-semibold">
                       {selectedOrder.userName}
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-600 break-all mt-1">
+                    <p className="text-xs sm:text-sm text-slate-600 break-all mt-1">
                       {selectedOrder.email}
                     </p>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
                       User ID: {selectedOrder.userId}
                     </p>
                   </div>
 
-                  {/* === UPDATED STATUS UPDATE SECTION WITH MESSAGES === */}
-                  <div className="bg-gray-50 p-4 sm:p-5 rounded-xl border border-gray-200">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                  {/* Status Update Section */}
+                  <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <svg
+                          className="w-5 h-5 text-slate-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
                         Update Status
                       </h3>
                       <button
                         onClick={() => setShowHistoryModal(true)}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline"
+                        className="text-xs text-slate-700 hover:text-slate-900 font-semibold underline decoration-2"
                       >
                         View Logs
                       </button>
@@ -454,13 +532,13 @@ export default function OrderTable({ orders }) {
                         <>
                           <select
                             disabled
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                            className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm bg-slate-100 text-slate-500 cursor-not-allowed"
                           >
                             <option>{selectedOrder.status}</option>
                           </select>
                           <button
                             disabled
-                            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-400 text-white cursor-not-allowed"
+                            className="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-400 text-white cursor-not-allowed"
                           >
                             Update
                           </button>
@@ -470,7 +548,7 @@ export default function OrderTable({ orders }) {
                           <select
                             value={newStatus}
                             onChange={(e) => setNewStatus(e.target.value)}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            className="flex-1 px-3 py-2.5 border-2 border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-slate-500 focus:border-slate-500 bg-white font-medium text-slate-800"
                           >
                             <option value="">Select new status</option>
                             {statusOptions.map((status) => (
@@ -480,7 +558,6 @@ export default function OrderTable({ orders }) {
                             ))}
                           </select>
 
-                          {/* Update Button - Disabled if no QR/Confirmed */}
                           {selectedOrder.qrGeneratedByAdmin ||
                           selectedOrder.qrGenerated ||
                           selectedOrder.status === "Confirmed" ? (
@@ -491,12 +568,12 @@ export default function OrderTable({ orders }) {
                                 !newStatus ||
                                 newStatus === selectedOrder.status
                               }
-                              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                              className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-md ${
                                 updatingStatus ||
                                 !newStatus ||
                                 newStatus === selectedOrder.status
-                                  ? "bg-gray-400 text-white cursor-not-allowed"
-                                  : "bg-indigo-600 text-white hover:bg-indigo-700"
+                                  ? "bg-slate-400 text-white cursor-not-allowed"
+                                  : "bg-slate-800 text-white hover:bg-slate-900"
                               }`}
                             >
                               {updatingStatus ? "Updating..." : "Update"}
@@ -504,7 +581,7 @@ export default function OrderTable({ orders }) {
                           ) : (
                             <button
                               disabled
-                              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-300 text-gray-600 cursor-not-allowed"
+                              className="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-300 text-slate-600 cursor-not-allowed"
                             >
                               Update
                             </button>
@@ -513,34 +590,78 @@ export default function OrderTable({ orders }) {
                       )}
                     </div>
 
-                    {/* === MESSAGES BELOW DROPDOWN === */}
-                    <div className="mt-2">
+                    {/* Messages */}
+                    <div className="mt-3">
                       {!(
                         selectedOrder.qrGeneratedByAdmin ||
                         selectedOrder.qrGenerated ||
                         selectedOrder.status === "Confirmed"
                       ) && (
-                        <p className="text-xs text-red-600 italic">
-                          Please generate QR first to update status.
-                        </p>
+                        <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-2">
+                          <svg
+                            className="w-4 h-4 text-red-600 mt-0.5 shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="text-xs text-red-700 font-medium">
+                            Please generate QR first to update status.
+                          </p>
+                        </div>
                       )}
 
                       {selectedOrder.status === "Delivered" && (
-                        <p className="text-xs text-red-600 italic">
-                          Delivered orders cannot be modified.
-                        </p>
+                        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                          <svg
+                            className="w-4 h-4 text-amber-600 mt-0.5 shrink-0"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="text-xs text-amber-700 font-medium">
+                            Delivered orders cannot be modified.
+                          </p>
+                        </div>
                       )}
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-2">
-                      Current: <strong>{selectedOrder.status}</strong>
-                    </p>
+                    <div className="mt-2 pt-2 border-t border-slate-200">
+                      <p className="text-xs text-slate-600">
+                        Current Status:{" "}
+                        <span className="font-bold text-slate-900">
+                          {selectedOrder.status}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Product Table/Cards */}
                 <div className="mb-6 sm:mb-8">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3 sm:mb-4 flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5 text-slate-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
                     Ordered Products
                   </h3>
 
@@ -548,27 +669,33 @@ export default function OrderTable({ orders }) {
                     {selectedOrder.products.map((p, i) => (
                       <div
                         key={i}
-                        className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                        className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm"
                       >
-                        <p className="font-semibold text-gray-900 mb-2">
+                        <p className="font-bold text-slate-900 mb-2">
                           {p.name}
                         </p>
                         <div className="grid grid-cols-3 gap-2 text-sm">
                           <div>
-                            <p className="text-gray-500 text-xs">Qty</p>
-                            <p className="text-gray-700 font-medium">
+                            <p className="text-slate-500 text-xs font-medium">
+                              Qty
+                            </p>
+                            <p className="text-slate-800 font-semibold">
                               {p.quantity}
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-500 text-xs">Price</p>
-                            <p className="text-gray-700">
+                            <p className="text-slate-500 text-xs font-medium">
+                              Price
+                            </p>
+                            <p className="text-slate-800 font-semibold">
                               ₹{p.price.toLocaleString()}
                             </p>
                           </div>
                           <div>
-                            <p className="text-gray-500 text-xs">Total</p>
-                            <p className="text-indigo-700 font-semibold">
+                            <p className="text-slate-500 text-xs font-medium">
+                              Total
+                            </p>
+                            <p className="text-slate-900 font-bold">
                               ₹{(p.price * p.quantity).toLocaleString()}
                             </p>
                           </div>
@@ -577,40 +704,40 @@ export default function OrderTable({ orders }) {
                     ))}
                   </div>
 
-                  <div className="hidden sm:block overflow-x-auto">
-                    <table className="w-full border border-gray-200 rounded-xl">
-                      <thead className="bg-indigo-50 text-indigo-700 text-xs sm:text-sm font-semibold">
+                  <div className="hidden sm:block overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <table className="w-full">
+                      <thead className="bg-slate-100 text-slate-700 text-xs sm:text-sm font-bold">
                         <tr>
-                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-left border-b">
+                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-left border-b border-slate-200">
                             Product
                           </th>
-                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-center border-b">
+                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-center border-b border-slate-200">
                             Quantity
                           </th>
-                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-center border-b">
+                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-center border-b border-slate-200">
                             Price
                           </th>
-                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-right border-b">
+                          <th className="py-3 sm:py-4 px-3 sm:px-6 text-right border-b border-slate-200">
                             Total
                           </th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-slate-200">
                         {selectedOrder.products.map((p, i) => (
                           <tr
                             key={i}
-                            className="border-b hover:bg-gray-50 transition"
+                            className="hover:bg-slate-50 transition-colors"
                           >
-                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-700 text-sm">
+                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-slate-800 text-sm font-medium">
                               {p.name}
                             </td>
-                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-center text-gray-700 text-sm">
+                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-center text-slate-800 text-sm font-semibold">
                               {p.quantity}
                             </td>
-                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-center text-gray-700 text-sm">
+                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-center text-slate-800 text-sm font-semibold">
                               ₹{p.price.toLocaleString()}
                             </td>
-                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-right font-semibold text-indigo-700 text-sm">
+                            <td className="py-3 sm:py-4 px-3 sm:px-6 text-right font-bold text-slate-900 text-sm">
                               ₹{(p.price * p.quantity).toLocaleString()}
                             </td>
                           </tr>
@@ -619,26 +746,42 @@ export default function OrderTable({ orders }) {
                     </table>
                   </div>
 
-                  <div className="border-t border-gray-200 pt-3 sm:pt-4 mt-3 sm:mt-4 text-right">
-                    <p className="text-lg sm:text-xl font-bold text-gray-900">
-                      Total: ₹{selectedOrder.totalAmount.toLocaleString()}
+                  <div className="bg-slate-100 border border-slate-200 rounded-xl pt-4 sm:pt-5 pb-3 sm:pb-4 px-4 sm:px-6 mt-4 text-right">
+                    <p className="text-lg sm:text-xl font-bold text-slate-900">
+                      Total Amount: ₹
+                      {selectedOrder.totalAmount.toLocaleString()}
                     </p>
                   </div>
                 </div>
 
                 {/* QR Section */}
                 {selectedOrder.qrCode && (
-                  <div className="bg-indigo-50 p-4 sm:p-6 rounded-xl border border-indigo-200 text-center">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
-                      Order Verification QR
+                  <div className="bg-emerald-50 p-4 sm:p-6 rounded-xl border border-emerald-200 shadow-md text-center">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-3 sm:mb-4 flex items-center justify-center gap-2">
+                      <svg
+                        className="w-6 h-6 text-emerald-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+                        />
+                      </svg>
+                      Order Verification QR Code
                     </h3>
-                    <img
-                      src={selectedOrder.qrCode}
-                      alt="QR Code"
-                      className="w-36 h-36 sm:w-48 sm:h-48 mx-auto object-contain rounded-lg"
-                    />
-                    <p className="text-gray-600 text-xs sm:text-sm mt-3">
-                      Scan this QR to verify order
+                    <div className="bg-white p-4 rounded-lg inline-block shadow-lg">
+                      <img
+                        src={selectedOrder.qrCode}
+                        alt="QR Code"
+                        className="w-36 h-36 sm:w-48 sm:h-48 mx-auto object-contain"
+                      />
+                    </div>
+                    <p className="text-slate-600 text-xs sm:text-sm mt-3 font-medium">
+                      Scan this QR code to verify the order
                     </p>
 
                     <button
@@ -648,8 +791,21 @@ export default function OrderTable({ orders }) {
                         link.download = `${selectedOrder.orderId}_QRCode.png`;
                         link.click();
                       }}
-                      className="mt-4 px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                      className="mt-4 px-6 py-2.5 bg-slate-800 text-white rounded-lg text-sm font-semibold hover:bg-slate-900 transition-all shadow-md inline-flex items-center gap-2"
                     >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
                       Download QR Code
                     </button>
                   </div>
@@ -659,61 +815,109 @@ export default function OrderTable({ orders }) {
           </div>
         )}
 
-        {/* Status History Modal - Blur Background */}
+        {/* Status History Modal */}
         {showHistoryModal && selectedOrder && (
           <div
-            className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/30 z-50 p-4"
+            className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-slate-900 bg-opacity-20 z-50 p-4"
             onClick={() => setShowHistoryModal(false)}
           >
             <div
-              className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto p-6"
+              className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto border border-slate-200"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
-                  Status Change History
-                </h3>
+              {/* History Modal Header */}
+              <div className="bg-slate-800 text-white p-6 sticky top-0">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold flex items-center gap-2">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Status Change History
+                  </h3>
+                  <button
+                    onClick={() => setShowHistoryModal(false)}
+                    className="text-white hover:text-red-400 text-2xl transition w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-10"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              {/* History Content */}
+              <div className="p-6">
+                <div className="space-y-4">
+                  {selectedOrder.statusHistory &&
+                  selectedOrder.statusHistory.length > 0 ? (
+                    selectedOrder.statusHistory.map((log, i) => (
+                      <div
+                        key={i}
+                        className="bg-slate-50 border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-slate-700 rounded-full mt-2 shrink-0"></div>
+                          <div className="flex-1">
+                            <p className="font-bold text-slate-900">
+                              {log.status}
+                            </p>
+                            <p className="text-xs text-slate-600 mt-1">
+                              Changed by{" "}
+                              <span className="font-semibold text-slate-800">
+                                {log.changedBy}
+                              </span>
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {formatDate(log.timestamp)}
+                            </p>
+                            {log.note && (
+                              <div className="mt-2 bg-blue-50 border border-blue-200 rounded px-3 py-2">
+                                <p className="text-xs text-blue-700 font-medium">
+                                  {log.note}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <svg
+                        className="w-12 h-12 text-slate-300 mx-auto mb-3"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      <p className="text-sm text-slate-500 font-medium">
+                        No status changes recorded yet.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 <button
                   onClick={() => setShowHistoryModal(false)}
-                  className="text-gray-500 hover:text-red-600 text-xl"
+                  className="mt-6 w-full px-4 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors"
                 >
-                  ×
+                  Close
                 </button>
               </div>
-
-              <div className="space-y-3">
-                {selectedOrder.statusHistory &&
-                selectedOrder.statusHistory.length > 0 ? (
-                  selectedOrder.statusHistory.map((log, i) => (
-                    <div
-                      key={i}
-                      className="border-b border-gray-200 pb-3 last:border-0"
-                    >
-                      <p className="font-medium text-gray-800">{log.status}</p>
-                      <p className="text-xs text-gray-500">
-                        by <strong>{log.changedBy}</strong> on{" "}
-                        {formatDate(log.timestamp)}
-                      </p>
-                      {log.note && (
-                        <p className="text-xs text-indigo-600 mt-1 italic">
-                          {log.note}
-                        </p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500 text-center py-4">
-                    No status changes recorded yet.
-                  </p>
-                )}
-              </div>
-
-              <button
-                onClick={() => setShowHistoryModal(false)}
-                className="mt-4 w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-              >
-                Close
-              </button>
             </div>
           </div>
         )}

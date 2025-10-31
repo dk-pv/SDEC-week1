@@ -113,7 +113,7 @@ export default function UserOrders() {
         setOrders((prev) => {
           const exists = prev.some((o) => o._id === data.order._id);
           if (exists) return prev;
-          return [data.order, ...prev]; // Add new order on top
+          return [data.order, ...prev];
         });
       }
     });
@@ -130,9 +130,9 @@ export default function UserOrders() {
     if (isCancelled) {
       return (
         <div className="flex items-center justify-center py-4">
-          <div className="flex items-center gap-2 text-red-500">
+          <div className="flex items-center gap-2 text-red-600">
             <XCircle className="w-5 h-5" />
-            <span className="font-medium">Order Cancelled</span>
+            <span className="font-semibold">Order Cancelled</span>
           </div>
         </div>
       );
@@ -143,7 +143,7 @@ export default function UserOrders() {
         <div className="flex items-center justify-between relative">
           <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-200">
             <div
-              className="h-full bg-green-400 transition-all duration-500"
+              className="h-full bg-linear-to-r from-emerald-500 to-teal-500 transition-all duration-500"
               style={{
                 width: `${(currentIndex / (ORDER_STATUSES.length - 1)) * 100}%`,
               }}
@@ -155,16 +155,16 @@ export default function UserOrders() {
             return (
               <div key={status} className="flex flex-col items-center relative">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm ${
                     isCompleted
-                      ? "bg-green-400 text-white"
-                      : "bg-gray-200 text-gray-400"
+                      ? "bg-linear-to-br from-emerald-500 to-teal-500 text-white"
+                      : "bg-gray-100 text-gray-400"
                   }`}
                 >
                   {getStatusIcon(status)}
                 </div>
                 <span
-                  className={`text-xs mt-1.5 text-center max-w-16 ${
+                  className={`text-xs mt-1.5 text-center max-w-16 font-medium ${
                     isCompleted ? "text-gray-700" : "text-gray-400"
                   }`}
                 >
@@ -179,83 +179,91 @@ export default function UserOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-gray-50 to-stone-50 p-6">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-1">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
             Track Your Orders
           </h1>
-          <p className="text-gray-500">Enter your email to view order status</p>
+          <p className="text-gray-600 text-lg">
+            Enter your email to view order status
+          </p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="mb-8 flex flex-col sm:flex-row justify-center items-center gap-3"
+          className="mb-10 flex flex-col sm:flex-row justify-center items-center gap-3"
         >
           <input
             type="email"
             placeholder="Enter your email (e.g. john@example.com)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 p-2.5 rounded-lg w-full sm:w-72 focus:outline-none focus:border-blue-400"
+            className="border-2 border-gray-200 p-3 rounded-xl w-full sm:w-80 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all shadow-sm"
             required
           />
           <button
             type="submit"
-            className="w-full sm:w-auto px-6 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="w-full sm:w-auto px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-md hover:shadow-lg font-semibold"
           >
             Search Orders
           </button>
         </form>
 
         {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-500 mt-3">Loading orders...</p>
+          <div className="text-center py-16">
+            <div className="inline-block w-12 h-12 border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+            <p className="text-gray-600 mt-4 font-medium">Loading orders...</p>
           </div>
         )}
 
         {searched && !loading && message && (
-          <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-            <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">{message}</p>
+          <div className="text-center py-16 bg-white rounded-2xl border-2 border-gray-100 shadow-sm">
+            <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-600 text-lg">{message}</p>
           </div>
         )}
 
         {orders.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {orders.map((order) => (
               <div
                 key={order._id}
                 onClick={() => setSelectedOrder(order)}
-                className="bg-white rounded-lg border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+                className="bg-white rounded-2xl border-2 border-gray-100 cursor-pointer hover:shadow-xl hover:border-purple-200 transition-all duration-300 overflow-hidden"
               >
-                <div className="bg-blue-50 p-4 flex justify-between items-center border-b border-gray-200">
+                <div className="bg-linear-to-r from-purple-50 via-pink-50 to-rose-50 p-5 flex justify-between items-center border-b-2 border-gray-100">
                   <div>
-                    <p className="text-xs text-gray-500">Order ID</p>
-                    <p className="font-semibold text-gray-800">
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                      Order ID
+                    </p>
+                    <p className="font-bold text-gray-800 text-lg">
                       {order.orderId}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Total Amount</p>
-                    <p className="font-bold text-lg text-gray-800">
+                    <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                      Total Amount
+                    </p>
+                    <p className="font-bold text-2xl bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       ₹{order.totalAmount.toLocaleString()}
                     </p>
                   </div>
                 </div>
 
-                <div className="p-5">{renderStatusTracker(order.status)}</div>
+                <div className="p-6">{renderStatusTracker(order.status)}</div>
 
-                <div className="px-5 pb-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Current Status:</span>
+                <div className="px-6 pb-5 flex items-center justify-between">
+                  <span className="text-sm text-gray-600 font-semibold">
+                    Current Status:
+                  </span>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    className={`px-4 py-2 rounded-xl text-sm font-bold shadow-sm ${
                       order.status === "Delivered"
-                        ? "bg-green-100 text-green-600"
+                        ? "bg-linear-to-r from-emerald-100 to-teal-100 text-emerald-700"
                         : order.status === "Cancelled"
-                        ? "bg-red-100 text-red-600"
-                        : "bg-blue-100 text-blue-600"
+                        ? "bg-linear-to-r from-red-100 to-rose-100 text-red-700"
+                        : "bg-linear-to-r from-purple-100 to-pink-100 text-purple-700"
                     }`}
                   >
                     {order.status}
@@ -266,94 +274,118 @@ export default function UserOrders() {
           </div>
         )}
 
-        {/* Modal with Blur Background */}
         {selectedOrder && (
           <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
             <div
-              className="absolute inset-0 backdrop-blur-sm bg-white/80"
+              className="absolute inset-0 backdrop-blur-md bg-gray-900/20"
               onClick={() => setSelectedOrder(null)}
             />
-            <div className="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10">
-              <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white z-20">
-                <h2 className="text-xl font-bold text-gray-800">
+            <div className="relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10 border-2 border-gray-100">
+              <div className="flex justify-between items-center p-6 border-b-2 border-gray-100 sticky top-0 bg-linear-to-r from-purple-50 via-pink-50 to-rose-50 z-20 rounded-t-3xl">
+                <h2 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   Order Details
                 </h2>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 hover:bg-white rounded-full p-2 transition-all"
                 >
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="p-5 space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-gray-500" />
+              <div className="p-6 space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="flex items-center gap-3 bg-linear-to-br from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-100">
+                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                      <User className="w-5 h-5 text-purple-600" />
+                    </div>
                     <div>
-                      <p className="text-sm text-gray-500">Customer</p>
-                      <p className="font-medium">{selectedOrder.userName}</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                        Customer
+                      </p>
+                      <p className="font-bold text-gray-800">
+                        {selectedOrder.userName}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-5 h-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="text-sm break-all">{selectedOrder.email}</p>
+                  <div className="flex items-center gap-3 bg-linear-to-br from-rose-50 to-orange-50 p-4 rounded-xl border border-rose-100">
+                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                      <Mail className="w-5 h-5 text-rose-600" />
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                        Email
+                      </p>
+                      <p className="text-sm break-all font-medium text-gray-700">
+                        {selectedOrder.email}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-gray-500" />
+                  <div className="flex items-center gap-3 bg-linear-to-br from-teal-50 to-emerald-50 p-4 rounded-xl border border-teal-100">
+                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                      <Calendar className="w-5 h-5 text-teal-600" />
+                    </div>
                     <div>
-                      <p className="text-sm text-gray-500">Placed On</p>
-                      <p className="text-sm">
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                        Placed On
+                      </p>
+                      <p className="text-sm font-bold text-gray-800">
                         {new Date(selectedOrder.createdAt).toLocaleDateString(
                           "en-IN"
                         )}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-gray-500" />
-                    <div>
-                      <p className="text-sm text-gray-500">Order ID</p>
-                      <p className="font-mono text-sm">
+                  <div className="flex items-center gap-3 bg-linear-to-br from-amber-50 to-yellow-50 p-4 rounded-xl border border-amber-100">
+                    <div className="bg-white p-2 rounded-lg shadow-sm">
+                      <Package className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                        Order ID
+                      </p>
+                      <p className="font-mono text-sm font-bold text-gray-800">
                         {selectedOrder.orderId}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-gray-800 mb-3">
+                <div className="border-t-2 border-gray-100 pt-6">
+                  <h3 className="font-bold text-gray-800 mb-4 text-lg">
                     Order Progress
                   </h3>
                   {renderStatusTracker(selectedOrder.status)}
                 </div>
 
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-gray-800 mb-3">Products</h3>
+                <div className="border-t-2 border-gray-100 pt-6">
+                  <h3 className="font-bold text-gray-800 mb-4 text-lg">
+                    Products
+                  </h3>
                   <div className="space-y-3">
                     {selectedOrder.products.map((p, i) => (
                       <div
                         key={i}
-                        className="flex justify-between items-center bg-gray-50 p-3 rounded-lg"
+                        className="flex justify-between items-center bg-linear-to-r from-gray-50 to-slate-50 p-4 rounded-xl border border-gray-200 hover:shadow-md transition-all"
                       >
                         <div>
-                          <p className="font-medium">{p.name}</p>
-                          <p className="text-sm text-gray-500">
-                            Qty: {p.quantity}
+                          <p className="font-bold text-gray-800">{p.name}</p>
+                          <p className="text-sm text-gray-600 font-semibold mt-1">
+                            Quantity: {p.quantity}
                           </p>
                         </div>
-                        <p className="font-semibold">
+                        <p className="font-bold text-lg bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                           ₹{(p.price * p.quantity).toLocaleString()}
                         </p>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 pt-3 border-t text-right">
-                    <p className="text-lg font-bold text-gray-800">
-                      Total: ₹{selectedOrder.totalAmount.toLocaleString()}
+                  <div className="mt-6 pt-4 border-t-2 border-gray-200 text-right bg-linear-to-r from-purple-50 to-pink-50 p-5 rounded-xl">
+                    <p className="text-sm text-gray-600 font-semibold mb-1">
+                      Grand Total
+                    </p>
+                    <p className="text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      ₹{selectedOrder.totalAmount.toLocaleString()}
                     </p>
                   </div>
                 </div>
