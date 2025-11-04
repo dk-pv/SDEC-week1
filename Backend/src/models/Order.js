@@ -68,7 +68,6 @@ const orderSchema = new mongoose.Schema(
       default: "Pending Admin Confirmation",
     },
 
-    // 🆕 Status change history (log)
     statusHistory: [
       {
         status: { type: String },
