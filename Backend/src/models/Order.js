@@ -71,9 +71,9 @@ const orderSchema = new mongoose.Schema(
     statusHistory: [
       {
         status: { type: String },
-        changedBy: { type: String }, // 'Admin' or 'System' or 'User'
+        changedBy: { type: String }, 
         timestamp: { type: Date, default: Date.now },
-        note: { type: String }, // optional comment
+        note: { type: String }, 
       },
     ],
   },
@@ -82,7 +82,6 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// 🧮 Auto calculate total amount
 orderSchema.pre("save", function (next) {
   this.totalAmount = this.products.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -91,7 +90,6 @@ orderSchema.pre("save", function (next) {
   next();
 });
 
-// 🧱 Prevent editing completed (Delivered) orders
 orderSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
   const orderId = this.getQuery()._id || this.getQuery().id;
@@ -101,7 +99,6 @@ orderSchema.pre("findOneAndUpdate", async function (next) {
   const order = await this.model.findById(orderId);
   if (!order) return next();
 
-  // Prevent updates if order is already delivered
   if (order.status === "Delivered") {
     const err = new Error(
       "Completed orders cannot be modified (read-only protection enabled)."
@@ -118,7 +115,6 @@ orderSchema.pre("findOneAndUpdate", async function (next) {
       note: `Status changed from ${order.status} → ${update.status}`,
     };
 
-    // Push history entry
     await order.updateOne({ $push: { statusHistory: historyEntry } });
   }
 
